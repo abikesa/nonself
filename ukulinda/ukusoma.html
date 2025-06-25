@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Commands Cheat Sheet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .search-box {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            color: #e0e0e0;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        #searchInput:focus {
+            border-color: #4ecdc4;
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+        }
+
+        #searchInput::placeholder {
+            color: #888;
+        }
+
+        .category {
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 4px solid #4ecdc4;
+            transition: all 0.3s ease;
+        }
+
+        .category:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .category h2 {
+            color: #4ecdc4;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .command-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .command-item:hover {
+            background: rgba(0, 0, 0, 0.5);
+            border-color: #ff6b6b;
+            transform: translateX(5px);
+        }
+
+        .command-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 107, 107, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .command-item:hover::before {
+            transform: translateX(100%);
+        }
+
+        .command {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 14px;
+            color: #ffd93d;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            word-break: break-all;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .command:hover {
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+        }
+
+        .description {
+            color: #b0b0b0;
+            font-size: 13px;
+            margin-top: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .command-item:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4ecdc4;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stats {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .command {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 System Commands Arsenal</h1>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search commands... (e.g., 'git', 'remote', 'docker')">
+        </div>
+        
+        <div class="stats">
+            <span id="commandCount">0</span> commands available
+        </div>
+
+        <div class="category">
+            <h2>🌐 Remote Script Execution</h2>
+            <div class="command-item">
+                <div class="command">bash &lt;(curl -s https://raw.githubusercontent.com/abikesa/directory-tree/refs/heads/main/summarize.sh) .</div>
+                <div class="description">Execute remote directory analysis script</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"</div>
+                <div class="description">Install Oh My Zsh shell framework</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">curl -sSL https://get.docker.com/ | sh</div>
+                <div class="description">Install Docker via remote script</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">curl -fsSL https://deno.land/install.sh | sh</div>
+                <div class="description">Install Deno runtime</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>📊 System Analysis</h2>
+            <div class="command-item">
+                <div class="command">df -h</div>
+                <div class="description">Show disk space usage in human-readable format</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">du -sh * | sort -hr</div>
+                <div class="description">Show directory sizes sorted by largest</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">htop</div>
+                <div class="description">Interactive process viewer</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">lsof -i :8080</div>
+                <div class="description">Show processes using port 8080</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>🔧 Git Operations</h2>
+            <div class="command-item">
+                <div class="command">git log --oneline --graph --all</div>
+                <div class="description">Show compact git history with branch visualization</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">git clone --depth 1 https://github.com/user/repo.git</div>
+                <div class="description">Clone repository with only latest commit</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">git stash push -m "work in progress"</div>
+                <div class="description">Stash changes with a message</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">git branch -d feature-branch</div>
+                <div class="description">Delete a local branch</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>🐳 Docker Commands</h2>
+            <div class="command-item">
+                <div class="command">docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"</div>
+                <div class="description">List all containers with custom formatting</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">docker system prune -af</div>
+                <div class="description">Clean up all unused Docker resources</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">docker logs -f --tail 100 container_name</div>
+                <div class="description">Follow container logs with last 100 lines</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>🔍 File Operations</h2>
+            <div class="command-item">
+                <div class="command">find . -name "*.py" -type f -exec grep -l "import pandas" {} \;</div>
+                <div class="description">Find Python files containing pandas imports</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">rsync -avz --progress source/ destination/</div>
+                <div class="description">Sync files with progress bar</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">tar -czf backup.tar.gz --exclude='*.log' folder/</div>
+                <div class="description">Create compressed archive excluding log files</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>🌐 Network & Web</h2>
+            <div class="command-item">
+                <div class="command">curl -I https://example.com</div>
+                <div class="description">Show HTTP headers for a URL</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">wget -r -np -k -E https://example.com/</div>
+                <div class="description">Download entire website recursively</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">ssh -L 8080:localhost:3000 user@remote-server</div>
+                <div class="description">Create SSH tunnel for port forwarding</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>⚡ Quick Utilities</h2>
+            <div class="command-item">
+                <div class="command">python -m http.server 8000</div>
+                <div class="description">Start simple HTTP server on port 8000</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">watch -n 2 'df -h'</div>
+                <div class="description">Monitor disk usage every 2 seconds</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+            <div class="command-item">
+                <div class="command">history | grep "git commit"</div>
+                <div class="description">Search command history for git commits</div>
+                <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Command copied to clipboard!</div>
+
+    <script>
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const commandItems = document.querySelectorAll('.command-item');
+        const categories = document.querySelectorAll('.category');
+        const commandCount = document.getElementById('commandCount');
+
+        // Initialize command count
+        commandCount.textContent = commandItems.length;
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            let visibleCount = 0;
+
+            commandItems.forEach(item => {
+                const command = item.querySelector('.command').textContent.toLowerCase();
+                const description = item.querySelector('.description').textContent.toLowerCase();
+                
+                if (command.includes(searchTerm) || description.includes(searchTerm)) {
+                    item.classList.remove('hidden');
+                    visibleCount++;
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+
+            // Hide empty categories
+            categories.forEach(category => {
+                const visibleItems = category.querySelectorAll('.command-item:not(.hidden)');
+                if (visibleItems.length === 0) {
+                    category.classList.add('hidden');
+                } else {
+                    category.classList.remove('hidden');
+                }
+            });
+
+            commandCount.textContent = visibleCount;
+        });
+
+        // Copy command functionality
+        function copyCommand(button) {
+            const command = button.parentElement.querySelector('.command').textContent;
+            navigator.clipboard.writeText(command).then(() => {
+                showToast();
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        // Show toast notification
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Click to copy command
+        document.querySelectorAll('.command').forEach(cmd => {
+            cmd.addEventListener('click', function() {
+                navigator.clipboard.writeText(this.textContent).then(() => {
+                    showToast();
+                });
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === '/') {
+                e.preventDefault();
+                searchInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>
