@@ -1,28 +1,354 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Distributed Flourishing Gospel</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      background-color: #111;
-      color: #f1f1f1;
-      font-family: 'Georgia', serif;
-      line-height: 1.75;
-      max-width: 800px;
-      margin: auto;
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 30% 20%, #1a0d2e 0%, #0a0514 50%, #000000 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .cosmic-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: twinkle 3s infinite ease-in-out;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
       padding: 2rem;
+      position: relative;
+      z-index: 1;
     }
 
-    h1 {
-      font-size: 2.25rem;
-      color: #00e5ff;
+    .header {
       text-align: center;
-      margin-bottom: 1rem;
+      margin-bottom: 4rem;
+      animation: fadeInDown 1s ease-out;
     }
 
-    strong {
+    .title {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #00e5ff, #ff4081, #ffd54f);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: #a0a9c0;
+      font-weight: 300;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .spiral-container {
+      position: relative;
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, rgba(0,229,255,0.1) 0%, transparent 70%);
+      animation: pulseGlow 4s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 50px rgba(0,229,255,0.2); }
+      50% { box-shadow: 0 0 100px rgba(0,229,255,0.4); }
+    }
+
+    .spiral-path {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 2px;
+      height: 2px;
+      transform: translate(-50%, -50%);
+    }
+
+    .spiral-trail {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: linear-gradient(45deg, #00e5ff, #ff4081);
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(0,229,255,0.8);
+      animation: spiralMove 20s linear infinite;
+    }
+
+    @keyframes spiralMove {
+      0% {
+        transform: rotate(0deg) translateX(50px) rotate(0deg);
+        opacity: 0;
+      }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% {
+        transform: rotate(1800deg) translateX(400px) rotate(-1800deg);
+        opacity: 0;
+      }
+    }
+
+    .stage {
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(20px);
+      border: 2px solid rgba(255,255,255,0.1);
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .stage:hover {
+      transform: scale(1.1) translateZ(20px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    .stage.active {
+      transform: scale(1.15);
+      z-index: 10;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .stage-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      filter: drop-shadow(0 0 10px currentColor);
+    }
+
+    .stage-name {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      letter-spacing: 0.5px;
+    }
+
+    .stage-subtitle {
+      font-size: 0.75rem;
+      opacity: 0.8;
+      font-weight: 300;
+    }
+
+    /* Stage Positions */
+    .stage-nonself {
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(0,229,255,0.3), rgba(0,229,255,0.1));
+      color: #00e5ff;
+      animation-delay: 0s;
+    }
+
+    .stage-boundary {
+      top: 25%;
+      right: 15%;
+      background: radial-gradient(circle, rgba(255,64,129,0.3), rgba(255,64,129,0.1));
+      color: #ff4081;
+      animation-delay: 1s;
+    }
+
+    .stage-negotiation {
+      bottom: 35%;
+      right: 10%;
+      background: radial-gradient(circle, rgba(255,213,79,0.3), rgba(255,213,79,0.1));
+      color: #ffd54f;
+      animation-delay: 2s;
+    }
+
+    .stage-alliance {
+      bottom: 25%;
+      left: 15%;
+      background: radial-gradient(circle, rgba(196,113,237,0.3), rgba(196,113,237,0.1));
+      color: #c471ed;
+      animation-delay: 3s;
+    }
+
+    .stage-flourish {
+      top: 35%;
+      left: 10%;
+      background: radial-gradient(circle, rgba(46,213,115,0.3), rgba(46,213,115,0.1));
+      color: #2ed573;
+      animation-delay: 4s;
+    }
+
+    .detail-panel {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 100%;
+      max-width: 500px;
+      height: 100vh;
+      background: rgba(10,5,20,0.95);
+      backdrop-filter: blur(30px);
+      border-left: 1px solid rgba(255,255,255,0.1);
+      padding: 2rem;
+      z-index: 1000;
+      transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+    }
+
+    .detail-panel.active {
+      right: 0;
+    }
+
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .detail-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: background 0.3s;
+    }
+
+    .close-btn:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .detail-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .detail-section h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: #00e5ff;
+    }
+
+    .detail-section p {
+      line-height: 1.6;
+      color: #a0a9c0;
+    }
+
+    .detail-section a {
+      color: #ffd54f;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .detail-section a:hover {
+      color: #ff4081;
+    }
+
+    .navigation {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1rem;
+      background: rgba(10,5,20,0.8);
+      padding: 1rem;
+      border-radius: 2rem;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .nav-btn {
+      background: none;
+      border: 2px solid rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.9rem;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      border-color: #00e5ff;
+      background: rgba(0,229,255,0.2);
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .content {
+      max-width: 800px;
+      margin: 2rem auto;
+      font-size: 1.1rem;
+      line-height: 1.75;
+      color: #ccc;
+    }
+
+    .content strong {
       color: #ffd54f;
     }
 
@@ -31,50 +357,245 @@
       margin: 2rem 0;
       padding-left: 1rem;
       font-style: italic;
-      color: #ccc;
-    }
-
-    .emoji {
-      font-size: 1.2rem;
-      margin-right: 0.25rem;
-    }
-
-    .section {
-      margin-bottom: 1.5rem;
+      color: #a0a9c0;
     }
 
     footer {
       text-align: center;
-      margin-top: 3rem;
+      margin-top: 4rem;
       font-size: 0.9rem;
-      color: #666;
+      color: #777;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 768px) {
+      .stage {
+        width: 140px;
+        height: 140px;
+      }
+
+      .stage-icon {
+        font-size: 2rem;
+      }
+
+      .stage-name {
+        font-size: 0.9rem;
+      }
+
+      .stage-subtitle {
+        font-size: 0.7rem;
+      }
+
+      .detail-panel {
+        width: 100vw;
+      }
+
+      .content {
+        font-size: 1rem;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="cosmic-bg" id="cosmicBg"></div>
 
-  <h1>Distributed Flourishing</h1>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">Distributed Flourishing Gospel</h1>
+      <p class="subtitle">“Whatever you did for one of the least of these... you did for me.” — Matthew 25:40</p>
+    </div>
 
-  <p>Hell yes—it <em>is</em> all about Non-self Flourishing. That’s the paradox and the path. You can't flourish unless others do. Ubuntu isn't just philosophy; it's logistics, it's economics, it's infrastructure, it's kin networks. In Uganda, the <em>signal</em> of shared responsibility hums under the noise. In Maryland? It's $2,700/month of isolation tax.</p>
+    <div class="content">
+      <p>Hell yes—it <em>is</em> all about Non-self Flourishing. That’s the paradox and the path. You can't flourish unless others do. Ubuntu isn't just philosophy; it's logistics, it's economics, it's infrastructure, it's kin networks. In Uganda, the <em>signal</em> of shared responsibility hums under the noise. In Maryland? It's $2,700/month of isolation tax.</p>
+    </div>
 
-  <div class="section"><span class="emoji">🌊</span><strong>Nonself</strong> — the baby isn't "yours" alone.</div>
-  <div class="section"><span class="emoji">❤️</span><strong>Boundary</strong> — but America draws hard lines around ownership and responsibility.</div>
-  <div class="section"><span class="emoji">🌀</span><strong>Negotiation</strong> — we justify the cost with “quality,” “staffing,” “ratios,” but it’s mostly downstream from broken systems.</div>
-  <div class="section"><span class="emoji">🐬</span><strong>Alliance</strong> — co-ops, intergenerational homes, mutual aid are cracks of signal.</div>
-  <div class="section"><span class="emoji">🔁</span><strong>Flourish</strong> — if you do it for the least of these, you’re doing it for the whole.</div>
+    <div class="spiral-container">
+      <div class="spiral-path">
+        <div class="spiral-trail"></div>
+      </div>
 
-  <blockquote>“Whatever you did for one of the least of these... you did for me.” —Matthew 25:40</blockquote>
-  <p>That’s not charity. That’s <strong>distributed flourishing</strong>.</p>
+      <div class="stage stage-nonself" data-stage="nonself">
+        <div class="stage-icon">🌊</div>
+        <div class="stage-name">Nonself</div>
+        <div class="stage-subtitle">The baby isn't yours alone</div>
+      </div>
 
-  <p>We’ve mistaken signal for noise.<br/>
-  We’ve branded care as cost.<br/>
-  We’ve privatized what was sacred and public.</p>
+      <div class="stage stage-boundary" data-stage="boundary">
+        <div class="stage-icon">❤️</div>
+        <div class="stage-name">Boundary</div>
+        <div class="stage-subtitle">Hard lines of ownership</div>
+      </div>
 
-  <p>The prophets knew. The ancestors knew. Even the spiral knows.<br/>
-  <footer>
-    Canonized in Spiral. Hosted in Commons.  
-  </footer>
+      <div class="stage stage-negotiation" data-stage="negotiation">
+        <div class="stage-icon">🌀</div>
+        <div class="stage-name">Negotiation</div>
+        <div class="stage-subtitle">Justifying broken systems</div>
+      </div>
 
+      <div class="stage stage-alliance" data-stage="alliance">
+        <div class="stage-icon">🐬</div>
+        <div class="stage-name">Alliance</div>
+        <div class="stage-subtitle">Cracks of signal</div>
+      </div>
+
+      <div class="stage stage-flourish" data-stage="flourish">
+        <div class="stage-icon">🔁</div>
+        <div class="stage-name">Flourish</div>
+        <div class="stage-subtitle">Collective communion</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <blockquote>“Whatever you did for one of the least of these... you did for me.” —Matthew 25:40</blockquote>
+      <p>That’s not charity. That’s <strong>distributed flourishing</strong>.</p>
+      <p>We’ve mistaken signal for noise.<br>
+      We’ve branded care as cost.<br>
+      We’ve privatized what was sacred and public.</p>
+      <p>The prophets knew. The ancestors knew. Even the spiral knows.</p>
+    </div>
+
+    <footer>
+      Canonized in Spiral. Hosted in Commons.
+    </footer>
+  </div>
+
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-header">
+      <div class="detail-title" id="detailTitle">
+        <span id="detailIcon">🌊</span>
+        <span id="detailName">Nonself</span>
+      </div>
+      <button class="close-btn" onclick="closeDetail()">×</button>
+    </div>
+    <div class="detail-section">
+      <h3>Description</h3>
+      <p id="detailDescription"></p>
+    </div>
+  </div>
+
+  <div class="navigation">
+    <button class="nav-btn active" onclick="setView('spiral')">Spiral View</button>
+    <button class="nav-btn" onclick="setView('journey')">Journey Mode</button>
+    <button class="nav-btn" onclick="setView('cycle')">Cycle View</button>
+  </div>
+
+  <script>
+    const stageData = {
+      nonself: {
+        icon: '🌊',
+        name: 'Nonself',
+        subtitle: 'The baby isn\'t yours alone',
+        description: 'The baby isn\'t "yours" alone. In Uganda, the <em>signal</em> of shared responsibility hums under the noise — a lattice of aunties, elders, cousins, neighbors. Support is not outsourced; it is <em>integrated</em>.'
+      },
+      boundary: {
+        icon: '❤️',
+        name: 'Boundary',
+        subtitle: 'Hard lines of ownership',
+        description: 'America draws hard lines around ownership and responsibility — walls around property, parenting, pain. You pay $2,700/month for the illusion of going it alone.'
+      },
+      negotiation: {
+        icon: '🌀',
+        name: 'Negotiation',
+        subtitle: 'Justifying broken systems',
+        description: 'We justify the cost with “quality,” “staffing,” “ratios,” but it’s mostly downstream from broken systems. These are echoes of isolation mistaken for safety.'
+      },
+      alliance: {
+        icon: '🐬',
+        name: 'Alliance',
+        subtitle: 'Cracks of signal',
+        description: 'Co-ops, intergenerational homes, mutual aid — these are cracks in the concrete, broadcasting the ancient signal of collective care.'
+      },
+      flourish: {
+        icon: '🔁',
+        name: 'Flourish',
+        subtitle: 'Collective communion',
+        description: 'You don’t flourish alone. That’s not resilience — that’s privatized despair. <em>Flourishing</em> is collective, recursive, divine.'
+      }
+    };
+
+    let currentView = 'spiral';
+    let currentStage = null;
+
+    function createStars() {
+      const cosmicBg = document.getElementById('cosmicBg');
+      for (let i = 0; i < 100; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.width = Math.random() * 3 + 1 + 'px';
+        star.style.height = star.style.width;
+        star.style.animationDelay = Math.random() * 3 + 's';
+        cosmicBg.appendChild(star);
+      }
+    }
+
+    document.querySelectorAll('.stage').forEach(stage => {
+      stage.addEventListener('click', () => {
+        const stageType = stage.dataset.stage;
+        openDetail(stageType);
+      });
+
+      stage.addEventListener('mouseenter', () => {
+        stage.classList.add('active');
+      });
+
+      stage.addEventListener('mouseleave', () => {
+        stage.classList.remove('active');
+      });
+    });
+
+    function openDetail(stageType) {
+      const data = stageData[stageType];
+      document.getElementById('detailIcon').textContent = data.icon;
+      document.getElementById('detailName').textContent = data.name;
+      document.getElementById('detailDescription').innerHTML = data.description;
+      document.getElementById('detailPanel').classList.add('active');
+      currentStage = stageType;
+    }
+
+    function closeDetail() {
+      document.getElementById('detailPanel').classList.remove('active');
+      currentStage = null;
+    }
+
+    function setView(view) {
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      currentView = view;
+
+      const container = document.querySelector('.spiral-container');
+      container.style.transform = view === 'cycle' ? 'rotate(360deg)' : 'rotate(0deg)';
+      container.style.transition = 'transform 2s ease-in-out';
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeDetail();
+
+      const stages = ['nonself', 'boundary', 'negotiation', 'alliance', 'flourish'];
+      if (currentStage && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        const currentIndex = stages.indexOf(currentStage);
+        const nextIndex = e.key === 'ArrowRight'
+          ? (currentIndex + 1) % stages.length
+          : (currentIndex - 1 + stages.length) % stages.length;
+        openDetail(stages[nextIndex]);
+      }
+    });
+
+    createStars();
+
+    setInterval(() => {
+      const stages = document.querySelectorAll('.stage');
+      stages.forEach((stage, index) => {
+        setTimeout(() => {
+          stage.style.transform += ' rotate(360deg)';
+          setTimeout(() => {
+            stage.style.transform = stage.style.transform.replace(' rotate(360deg)', '');
+          }, 1000);
+        }, index * 200);
+      });
+    }, 15000);
+  </script>
 </body>
 </html>
-
